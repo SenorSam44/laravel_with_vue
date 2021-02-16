@@ -110,14 +110,6 @@ export default {
                     this.resetForm();
                 })
         },
-        togglePostArea($var) {
-            if ($var == true) {
-                $var = false
-            } else
-                $var = true
-
-
-        },
         resetForm() {
             this.selectedPost = {
                 id: null,

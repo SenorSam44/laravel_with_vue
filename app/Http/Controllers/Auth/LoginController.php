@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -36,5 +39,31 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+
+    /**
+     * @param Request $request
+     * @return false|\Illuminate\Http\JsonResponse
+     */
+    public function login(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+
+        $token = [];
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+            $tokenResult = $user->createToken('access_token');
+
+            return response()->json([
+                'access_token' => $tokenResult->accessToken,
+                'token_type'   => 'Bearer',
+                'user'         => $user,
+                'expires_at'   => Carbon::parse(
+                    $tokenResult->token->expires_at
+                )->toDateTimeString()
+            ]);
+        }
+
+        return false;
     }
 }
